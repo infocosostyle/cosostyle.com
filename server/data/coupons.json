@@ -1,0 +1,26 @@
+[
+  {
+    "_id": "1783416729115726",
+    "id": 1783416729115,
+    "createdAt": "2026-07-07T09:32:09.115Z",
+    "code": "COSO10",
+    "discountPercent": 0.1,
+    "active": true
+  },
+  {
+    "_id": "1783416729115602",
+    "id": 1783416729115,
+    "createdAt": "2026-07-07T09:32:09.115Z",
+    "code": "HEAVY20",
+    "discountPercent": 0.2,
+    "active": true
+  },
+  {
+    "_id": "1783416729116671",
+    "id": 1783416729116,
+    "createdAt": "2026-07-07T09:32:09.116Z",
+    "code": "FREESHIP",
+    "discountPercent": 0,
+    "active": true
+  }
+]

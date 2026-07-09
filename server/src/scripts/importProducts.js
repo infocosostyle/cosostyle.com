@@ -1,0 +1,571 @@
+import { connectDB, isJsonDb } from '../config/db.js';
+import Product from '../models/Product.js';
+import Category from '../models/Category.js';
+import Coupon from '../models/Coupon.js';
+import Review from '../models/Review.js';
+
+const BLANK_IMGS = [
+  "/src/assets/tshirt 1/05-05-2025 christian00428.jpg",
+  "/src/assets/tshirt 1/05-05-2025 christian00425.jpg",
+  "/src/assets/tshirt 1/05-05-2025 christian00428 - Copy.jpg",
+  "/src/assets/tshirt 1/05-05-2025 christian00430.jpg",
+  "/src/assets/tshirt 1/05-05-2025 christian00432.jpg",
+  "/src/assets/tshirt 1/05-05-2025 christian00434.jpg",
+  "/src/assets/tshirt 1/05-05-2025 christian00438.jpg",
+  "/src/assets/tshirt 1/05-05-2025 christian00440.jpg"
+];
+
+const LOGO_IMGS = [
+  "/src/assets/tshirt 2/05-05-2025 christian00445.jpg",
+  "/src/assets/tshirt 2/05-05-2025 christian00444.jpg",
+  "/src/assets/tshirt 2/05-05-2025 christian00445 - Copy.jpg",
+  "/src/assets/tshirt 2/05-05-2025 christian00449.jpg",
+  "/src/assets/tshirt 2/05-05-2025 christian00450.jpg",
+  "/src/assets/tshirt 2/05-05-2025 christian00452.jpg",
+  "/src/assets/tshirt 2/05-05-2025 christian00456.jpg",
+  "/src/assets/tshirt 2/05-05-2025 christian00462.jpg"
+];
+
+const SHADOW_IMGS = [
+  "/src/assets/tshirt 3/05-05-2025 christian00466.jpg",
+  "/src/assets/tshirt 3/05-05-2025 christian00463.jpg",
+  "/src/assets/tshirt 3/05-05-2025 christian00466 - Copy.jpg",
+  "/src/assets/tshirt 3/05-05-2025 christian00468.jpg",
+  "/src/assets/tshirt 3/05-05-2025 christian00470.jpg",
+  "/src/assets/tshirt 3/05-05-2025 christian00474.jpg",
+  "/src/assets/tshirt 3/05-05-2025 christian00475.jpg",
+  "/src/assets/tshirt 3/05-05-2025 christian00479.jpg"
+];
+
+const VINTAGE_IMGS = [
+  "/src/assets/tshirt 4/05-05-2025 christian00483.jpg",
+  "/src/assets/tshirt 4/05-05-2025 christian00480.jpg",
+  "/src/assets/tshirt 4/05-05-2025 christian00483 - Copy.jpg",
+  "/src/assets/tshirt 4/05-05-2025 christian00485.jpg",
+  "/src/assets/tshirt 4/05-05-2025 christian00487.jpg",
+  "/src/assets/tshirt 4/05-05-2025 christian00489.jpg",
+  "/src/assets/tshirt 4/05-05-2025 christian00492.jpg",
+  "/src/assets/tshirt 4/05-05-2025 christian00496.jpg"
+];
+
+const EARTH_IMGS = [
+  "/src/assets/tshirt 5/05-05-2025 christian00499.jpg",
+  "/src/assets/tshirt 5/05-05-2025 christian00497 1.jpg",
+  "/src/assets/tshirt 5/05-05-2025 christian00499 - Copy.jpg",
+  "/src/assets/tshirt 5/05-05-2025 christian00502.jpg",
+  "/src/assets/tshirt 5/05-05-2025 christian00505.jpg",
+  "/src/assets/tshirt 5/05-05-2025 christian00510.jpg",
+  "/src/assets/tshirt 5/05-05-2025 christian00511.jpg",
+  "/src/assets/tshirt 5/05-05-2025 christian00513.jpg"
+];
+
+// Helper to generate S-2XL size chart
+const standardSizeChart = {
+  S: { chest: "38 in", length: "27 in", shoulder: "17.5 in" },
+  M: { chest: "40 in", length: "28 in", shoulder: "18 in" },
+  L: { chest: "42 in", length: "29 in", shoulder: "19 in" },
+  XL: { chest: "44 in", length: "30 in", shoulder: "20 in" },
+  "2XL": { chest: "46 in", length: "31 in", shoulder: "21 in" }
+};
+
+const productsData = [
+  {
+    sku: 'B0F89J746L',
+    title: 'Cosostyle Men Pink Polo Neck T-Shirt',
+    price: 399.00,
+    category: 'classic',
+    subcategory: 'polos',
+    collectionName: 'Summer Polo Series',
+    gender: 'men',
+    tag: 'BESTSELLER',
+    image: VINTAGE_IMGS[0],
+    images: VINTAGE_IMGS,
+    color: 'Pink',
+    colors: [
+      { name: 'Pink', value: '#EAD8D7', class: 'bg-[#EAD8D7] border-neutral-400' }
+    ],
+    sizes: ['S', 'M', 'L', 'XL', '2XL'],
+    description: 'This men\'s Pink polo neck t-shirt brings a refreshing splash of color. The cool, serene aqua hue evokes a sense of calm and style. Meticulously knitted with double pique structures to maintain elasticity and shape over countless wash cycles.',
+    specs: [
+      'Material: 100% fine combed cotton knit',
+      'Fit: Regular Fit',
+      'Sleeve Type: Classic Half sleeve',
+      'Collar Style: Structured polo collar band',
+      'Occasion: Casual Everyday Style'
+    ],
+    highlights: [
+      'Genuine 240 GSM pique structural knit',
+      'Tonal flatlock double-stitched pocket lines',
+      'Lay-flat ribbed polo neckline shape'
+    ],
+    fabric: '100% Premium Cotton Knit',
+    material: 'Organic Long-Staple Cotton',
+    fitType: 'Regular Fit',
+    sleeveType: 'Half Sleeve',
+    neckType: 'Polo Neck',
+    pattern: 'Solid Pink Tone',
+    occasion: 'Casual Wear',
+    washCare: 'Machine wash cold with similar colors. Dry flat inside out in shade to maintain pink hue.',
+    countryOfOrigin: 'India',
+    packageContents: '1 Men Polo T-Shirt',
+    brandInfo: 'CoSoStyle',
+    sizeChart: standardSizeChart,
+    seoTitle: 'Buy Cosostyle Men Pink Polo Neck T-Shirt Online - Premium Quality',
+    seoDescription: 'Shop the official Cosostyle Men Pink Polo Neck T-Shirt. 100% premium cotton, regular fit, and classic polo collar. Free shipping in India.',
+    seoKeywords: ['pink polo', 'men polo neck t-shirt', 'cosostyle polo', 'cotton pink shirt'],
+    inventory: 150,
+    availability: 'in-stock',
+    variants: [
+      { sku: 'B0F89KLWDX', size: 'S', color: 'Pink', price: 399.00, inventory: 30, images: [VINTAGE_IMGS[0], VINTAGE_IMGS[1]] },
+      { sku: 'B0F89J746H', size: 'M', color: 'Pink', price: 399.00, inventory: 40, images: [VINTAGE_IMGS[0], VINTAGE_IMGS[2]] },
+      { sku: 'B0F89GR3HG', size: 'L', color: 'Pink', price: 399.00, inventory: 25, images: [VINTAGE_IMGS[0], VINTAGE_IMGS[3]] },
+      { sku: 'B0F89KD33B', size: 'XL', color: 'Pink', price: 399.00, inventory: 35, images: [VINTAGE_IMGS[0], VINTAGE_IMGS[4]] },
+      { sku: 'B0F89JW37J', size: '2XL', color: 'Pink', price: 399.00, inventory: 20, images: [VINTAGE_IMGS[0], VINTAGE_IMGS[5]] }
+    ]
+  },
+  {
+    sku: 'B0F89JFK6G',
+    title: 'Cosostyle Men Sky Blue Polo Neck T-Shirt',
+    price: 399.00,
+    category: 'classic',
+    subcategory: 'polos',
+    collectionName: 'Summer Polo Series',
+    gender: 'men',
+    tag: 'NEW',
+    image: LOGO_IMGS[0],
+    images: LOGO_IMGS,
+    color: 'Sky Blue',
+    colors: [
+      { name: 'Sky Blue', value: '#BCD4E6', class: 'bg-[#BCD4E6] border-neutral-400' }
+    ],
+    sizes: ['S', 'M', 'L', 'XL', '2XL'],
+    description: 'Serene sky blue polo neck t-shirt designed for lightweight breathing and clean box shapes. High-end pique weave offers incredible sweat-absorption, keeping you cool throughout hot afternoons.',
+    specs: [
+      'Material: 100% Cotton pique blend',
+      'Fit: Regular Fit',
+      'Sleeve Type: Classic Half sleeve with ribbed cuffs',
+      'Collar Style: Lay-flat polo collar placket',
+      'Occasion: Semi-casual golf or lounge wear'
+    ],
+    highlights: [
+      'Premium pique structural breathability',
+      'Soft sky blue low-impact botanical dyes',
+      'Dual-button clean interface placket shape'
+    ],
+    fabric: '100% Organic Pique Cotton',
+    material: 'Combed Ringspun Cotton Pique',
+    fitType: 'Regular Fit',
+    sleeveType: 'Half Sleeve with Cuffs',
+    neckType: 'Polo Neck',
+    pattern: 'Solid Sky Blue',
+    occasion: 'Semi-Formal / Casual',
+    washCare: 'Machine wash cold. Turn inside out before washing. Do not bleach. Tumble dry low.',
+    countryOfOrigin: 'India',
+    packageContents: '1 Men Polo Neck Tee',
+    brandInfo: 'CoSoStyle',
+    sizeChart: standardSizeChart,
+    seoTitle: 'Buy Cosostyle Men Sky Blue Polo Neck T-Shirt - Official Store',
+    seoDescription: 'Purchase the premium Sky Blue Polo T-shirt for Men from Cosostyle. Comfortable organic cotton pique, flat collar placket, free delivery.',
+    seoKeywords: ['sky blue polo', 'men blue polo shirt', 'cosostyle premium shirts'],
+    inventory: 120,
+    availability: 'in-stock',
+    variants: [
+      { sku: 'B0F89K7S4Y', size: 'S', color: 'Sky Blue', price: 399.00, inventory: 20, images: [LOGO_IMGS[0], LOGO_IMGS[1]] },
+      { sku: 'B0F89KTSR2', size: 'M', color: 'Sky Blue', price: 399.00, inventory: 25, images: [LOGO_IMGS[0], LOGO_IMGS[2]] },
+      { sku: 'B0F89KRTGM', size: 'L', color: 'Sky Blue', price: 449.00, inventory: 30, images: [LOGO_IMGS[0], LOGO_IMGS[3]] },
+      { sku: 'B0F89K447X', size: 'XL', color: 'Sky Blue', price: 449.00, inventory: 25, images: [LOGO_IMGS[0], LOGO_IMGS[4]] },
+      { sku: 'B0F89JKDSK', size: '2XL', color: 'Sky Blue', price: 499.00, inventory: 20, images: [LOGO_IMGS[0], LOGO_IMGS[5]] }
+    ]
+  },
+  {
+    sku: 'CS-TEE-01-BLK',
+    title: 'COSOSTYLE BLACK ROUND NECK T-SHIRT',
+    price: 499.00,
+    category: 'classic',
+    subcategory: 'crews',
+    collectionName: 'Essentials Drop 01',
+    gender: 'unisex',
+    tag: 'NEW',
+    image: SHADOW_IMGS[0],
+    images: SHADOW_IMGS,
+    color: 'Black',
+    colors: [
+      { name: 'Onyx Black', value: '#0A0A0A', class: 'bg-black border-neutral-900' }
+    ],
+    sizes: ['S', 'M', 'L', 'XL'],
+    description: 'Bespoke crew t-shirt constructed from 100% fine cotton jersey. Features drop shoulder drape lines, flat coverstitched details, and reactive dye coloring designed to stay deep black.',
+    specs: [
+      'Material: 100% Cotton combed jersey',
+      'Fit: Regular boxy streetwear fit',
+      'Sleeve Type: Classic Half sleeve',
+      'Collar Style: Lay-flat crew neck collar',
+      'Occasion: Casual, minimal styling'
+    ],
+    highlights: [
+      'Heavyweight 240 GSM structure drape',
+      'Lay-flat ribbed collar band detailing',
+      'Reinforced shoulder tape seams'
+    ],
+    fabric: '100% Combed Cotton',
+    material: 'Combed Cotton Jersey',
+    fitType: 'Regular Boxy Fit',
+    sleeveType: 'Half Sleeve',
+    neckType: 'Round Neck',
+    pattern: 'Solid Matte Black',
+    occasion: 'Daily Lounge / Streetwear',
+    washCare: 'Wash cold inside out. Hand dry to preserve jet-black color details.',
+    countryOfOrigin: 'India',
+    packageContents: '1 Crewneck Black Tee',
+    brandInfo: 'CoSoStyle',
+    sizeChart: standardSizeChart,
+    seoTitle: 'Buy COSOSTYLE Black Round Neck T-Shirt - 240 GSM Streetwear',
+    seoDescription: 'Heavyweight black crewneck tee from Cosostyle. Combed ringspun cotton, drop shoulder drape, daily basic wear.',
+    seoKeywords: ['black streetwear tee', '240 gsm black t-shirt', 'cosostyle basic black'],
+    inventory: 200,
+    availability: 'in-stock',
+    variants: [
+      { sku: 'CS-TEE-01-BLK-S', size: 'S', color: 'Black', price: 499.00, inventory: 50, images: [SHADOW_IMGS[0]] },
+      { sku: 'CS-TEE-01-BLK-M', size: 'M', color: 'Black', price: 499.00, inventory: 50, images: [SHADOW_IMGS[0]] },
+      { sku: 'CS-TEE-01-BLK-L', size: 'L', color: 'Black', price: 499.00, inventory: 50, images: [SHADOW_IMGS[0]] },
+      { sku: 'CS-TEE-01-BLK-XL', size: 'XL', color: 'Black', price: 499.00, inventory: 50, images: [SHADOW_IMGS[0]] }
+    ]
+  },
+  {
+    sku: 'CS-TEE-02-WHT',
+    title: 'COSOSTYLE WHITE ROUND NECK T-SHIRT',
+    price: 299.00,
+    category: 'classic',
+    subcategory: 'crews',
+    collectionName: 'Essentials Drop 01',
+    gender: 'unisex',
+    tag: 'NEW',
+    image: BLANK_IMGS[0],
+    images: BLANK_IMGS,
+    color: 'White',
+    colors: [
+      { name: 'Pure White', value: '#FFFFFF', class: 'bg-white border-neutral-300' }
+    ],
+    sizes: ['S', 'M', 'L', 'XL'],
+    description: 'Perfect white canvas tee. Tailored from combed ringspun organic cotton providing a lay-flat neckline, breathable heavyweight jersey, and double needle stitch detailing.',
+    specs: [
+      'Material: 100% organic cotton',
+      'Fit: Regular boxy streetwear fit',
+      'Sleeve Type: Half sleeve',
+      'Collar Style: Lay-flat round collar'
+    ],
+    highlights: [
+      'Combed ringspun structure thread',
+      'High lay-flat crew collar band',
+      'Zero translucent visibility weave'
+    ],
+    fabric: '100% Combed Ringspun Cotton',
+    material: 'Organic Ringspun Cotton',
+    fitType: 'Regular Boxy Fit',
+    sleeveType: 'Half Sleeve',
+    neckType: 'Round Neck',
+    pattern: 'Solid White',
+    occasion: 'Casual Wear',
+    washCare: 'Wash cold inside out. Tumble dry low or air dry in shade.',
+    countryOfOrigin: 'India',
+    packageContents: '1 Crewneck White Tee',
+    brandInfo: 'CoSoStyle',
+    sizeChart: standardSizeChart,
+    seoTitle: 'Buy COSOSTYLE White Crewneck T-Shirt - Basic White Tee',
+    seoDescription: 'The ultimate basic white tee from Cosostyle. Heavyweight, non-see-through organic cotton ringspun, lay-flat collar.',
+    seoKeywords: ['white crewneck t-shirt', 'organic white tee', 'men white cotton shirt'],
+    inventory: 180,
+    availability: 'in-stock',
+    variants: [
+      { sku: 'CS-TEE-02-WHT-S', size: 'S', color: 'White', price: 299.00, inventory: 40, images: [BLANK_IMGS[0]] },
+      { sku: 'CS-TEE-02-WHT-M', size: 'M', color: 'White', price: 299.00, inventory: 50, images: [BLANK_IMGS[0]] },
+      { sku: 'CS-TEE-02-WHT-L', size: 'L', color: 'White', price: 299.00, inventory: 50, images: [BLANK_IMGS[0]] },
+      { sku: 'CS-TEE-02-WHT-XL', size: 'XL', color: 'White', price: 299.00, inventory: 40, images: [BLANK_IMGS[0]] }
+    ]
+  },
+  {
+    sku: 'CS-TEE-03-GRN',
+    title: 'COSOSTYLE MEN SKY GREEN POLO NECK T-SHIRT',
+    price: 399.00,
+    category: 'oversized',
+    subcategory: 'polos',
+    collectionName: 'Botanical Washes',
+    gender: 'men',
+    tag: 'LIMITED',
+    image: EARTH_IMGS[0],
+    images: EARTH_IMGS,
+    color: 'Green',
+    colors: [
+      { name: 'Sky Green', value: '#555D50', class: 'bg-[#555D50] border-neutral-600' }
+    ],
+    sizes: ['S', 'M', 'L', '2XL'],
+    description: 'Classic polo neckline meets streetwear geometry. Features utility chest patch pocket, dual button placket, and ribbed classic collar in our botanical sky green pigment wash.',
+    specs: [
+      'Material: 100% premium cotton knit',
+      'Fit: Regular relaxed polo fit',
+      'Sleeve: Half sleeve with ribbed cuffs',
+      'Collar: Structured classic polo collar'
+    ],
+    highlights: [
+      'Heavyweight cotton knit pattern',
+      'Sky green low-impact organic dye',
+      'Classic utility chest pocket detailing'
+    ],
+    fabric: 'Premium Botanical Dyed Cotton',
+    material: '100% Cotton Knit',
+    fitType: 'Oversized Relaxed Fit',
+    sleeveType: 'Half Sleeve',
+    neckType: 'Polo Neck',
+    pattern: 'Solid Washed Olive Green',
+    occasion: 'Streetwear / Outing',
+    washCare: 'Wash cold inside out. Low heat tumble dry.',
+    countryOfOrigin: 'India',
+    packageContents: '1 Polo Green T-Shirt',
+    brandInfo: 'CoSoStyle',
+    sizeChart: standardSizeChart,
+    seoTitle: 'Buy Cosostyle Sky Green Men Polo T-Shirt - Utility Pocket',
+    seoDescription: 'Shop the oversized botanical sky green polo shirt. Heavy cotton knit with dual placket buttons and front patch pocket.',
+    seoKeywords: ['green polo shirt', 'oversized green polo', 'cosostyle green shirt'],
+    inventory: 90,
+    availability: 'low-stock',
+    variants: [
+      { sku: 'CS-TEE-03-GRN-S', size: 'S', color: 'Green', price: 399.00, inventory: 20, images: [EARTH_IMGS[0]] },
+      { sku: 'CS-TEE-03-GRN-M', size: 'M', color: 'Green', price: 399.00, inventory: 30, images: [EARTH_IMGS[0]] },
+      { sku: 'CS-TEE-03-GRN-L', size: 'L', color: '399.00', inventory: 25, images: [EARTH_IMGS[0]] },
+      { sku: 'CS-TEE-03-GRN-2XL', size: '2XL', color: 'Green', price: 449.00, inventory: 15, images: [EARTH_IMGS[0]] }
+    ]
+  },
+  {
+    sku: 'CS-TEE-04-NVY',
+    title: 'COSOSTYLE NAVY ROUND NECK T-SHIRT',
+    price: 299.00,
+    category: 'classic',
+    subcategory: 'crews',
+    collectionName: 'Essentials Drop 01',
+    gender: 'unisex',
+    tag: 'NEW',
+    image: SHADOW_IMGS[4],
+    images: SHADOW_IMGS,
+    color: 'Navy',
+    colors: [
+      { name: 'Navy Blue', value: '#1A2E40', class: 'bg-[#1A2E40] border-neutral-900' }
+    ],
+    sizes: ['S', 'M', 'L', 'XL'],
+    description: 'Premium navy cotton tee built for structured drapes. Pre-shrunk ringspun cotton thread offers lay-flat coverstitch shoulders and deep dyed indigo color longevity.',
+    specs: [
+      'Material: 100% ringspun cotton',
+      'Fit: Regular boxy streetwear fit',
+      'Sleeve: Classic half sleeve',
+      'Collar: Lay-flat round collar'
+    ],
+    highlights: [
+      'Heavyweight 240 GSM double-stitch',
+      'Deep indigo reactive dye coloring',
+      'Lay-flat ribbed collar lines'
+    ],
+    fabric: '100% Ringspun Cotton Jersey',
+    material: 'Ringspun Combed Cotton',
+    fitType: 'Regular Fit',
+    sleeveType: 'Half Sleeve',
+    neckType: 'Round Neck',
+    pattern: 'Solid Deep Indigo',
+    occasion: 'Daily Essentials',
+    washCare: 'Machine wash cold with darks. Dry inside out.',
+    countryOfOrigin: 'India',
+    packageContents: '1 Indigo Round Neck Tee',
+    brandInfo: 'CoSoStyle',
+    sizeChart: standardSizeChart,
+    seoTitle: 'Buy COSOSTYLE Navy Blue Round Neck T-Shirt - Premium Cotton',
+    seoDescription: 'Shop the everyday basic navy blue t-shirt from Cosostyle. Heavyweight 240 GSM cotton, double-needle stitched seams, fade resistant.',
+    seoKeywords: ['navy blue t-shirt', 'dark blue crewneck', 'cosostyle basic blue'],
+    inventory: 140,
+    availability: 'in-stock',
+    variants: [
+      { sku: 'CS-TEE-04-NVY-S', size: 'S', color: 'Navy', price: 299.00, inventory: 35, images: [SHADOW_IMGS[4]] },
+      { sku: 'CS-TEE-04-NVY-M', size: 'M', color: 'Navy', price: 299.00, inventory: 40, images: [SHADOW_IMGS[4]] },
+      { sku: 'CS-TEE-04-NVY-L', size: 'L', color: 'Navy', price: 299.00, inventory: 35, images: [SHADOW_IMGS[4]] },
+      { sku: 'CS-TEE-04-NVY-XL', size: 'XL', color: 'Navy', price: 299.00, inventory: 30, images: [SHADOW_IMGS[4]] }
+    ]
+  },
+  {
+    sku: 'CS-POLO-05-BLK',
+    title: 'COSOSTYLE MEN BLACK POLO NECK T-SHIRT',
+    price: 399.00,
+    category: 'oversized',
+    subcategory: 'polos',
+    collectionName: 'Midnight Drops',
+    gender: 'men',
+    tag: 'BESTSELLER',
+    image: SHADOW_IMGS[1],
+    images: SHADOW_IMGS,
+    color: 'Black',
+    colors: [
+      { name: 'Onyx Black', value: '#0A0A0A', class: 'bg-black border-neutral-900' }
+    ],
+    sizes: ['S', 'M', 'L', 'XL', '2XL'],
+    description: 'Sleek black polo shirt constructed from premium heavyweight cotton. Clean placket design, classic collar lines, and subtle ribbed cuffs for an absolute minimal streetwear profile.',
+    specs: [
+      'Material: 100% combed cotton',
+      'Fit: Regular relaxed polo fit',
+      'Sleeve: Ribbed half sleeve',
+      'Collar: Classic lay-flat polo collar'
+    ],
+    highlights: [
+      'Clean dual-button placket shape',
+      'Deep onyx black fade resistance',
+      'Double-stitch reinforced hems'
+    ],
+    fabric: 'Combed Heavy Pique Cotton',
+    material: 'Organic Combed Cotton Pique',
+    fitType: 'Oversized Polo Fit',
+    sleeveType: 'Ribbed Half Sleeve',
+    neckType: 'Polo Neck',
+    pattern: 'Solid Jet Black',
+    occasion: 'Casual Wear / Smart Casual',
+    washCare: 'Machine wash cold inside out. Avoid direct sunlight drying to prevent fading.',
+    countryOfOrigin: 'India',
+    packageContents: '1 Men Black Polo',
+    brandInfo: 'CoSoStyle',
+    sizeChart: standardSizeChart,
+    seoTitle: 'Buy COSOSTYLE Men Black Polo T-Shirt - Premium Pique Knit',
+    seoDescription: 'Elevate your style with the Cosostyle Black Polo shirt. Pure combed pique cotton, double stitched collar placket, ribbed cuffs.',
+    seoKeywords: ['black polo tee', 'men cotton black polo', 'cosostyle classic black'],
+    inventory: 160,
+    availability: 'in-stock',
+    variants: [
+      { sku: 'CS-POLO-05-BLK-S', size: 'S', color: 'Black', price: 399.00, inventory: 30, images: [SHADOW_IMGS[1]] },
+      { sku: 'CS-POLO-05-BLK-M', size: 'M', color: 'Black', price: 399.00, inventory: 40, images: [SHADOW_IMGS[1]] },
+      { sku: 'CS-POLO-05-BLK-L', size: 'L', color: 'Black', price: 399.00, inventory: 30, images: [SHADOW_IMGS[1]] },
+      { sku: 'CS-POLO-05-BLK-XL', size: 'XL', color: 'Black', price: 399.00, inventory: 40, images: [SHADOW_IMGS[1]] },
+      { sku: 'CS-POLO-05-BLK-2XL', size: '2XL', color: 'Black', price: 449.00, inventory: 20, images: [SHADOW_IMGS[1]] }
+    ]
+  },
+  {
+    sku: 'CS-TEE-06-SGE',
+    title: 'COSOSTYLE SAGE GREEN ROUND NECK T-SHIRT',
+    price: 299.00,
+    category: 'classic',
+    subcategory: 'crews',
+    collectionName: 'Botanical Washes',
+    gender: 'unisex',
+    tag: 'NEW',
+    image: EARTH_IMGS[1],
+    images: EARTH_IMGS,
+    color: 'Green',
+    colors: [
+      { name: 'Sage Green', value: '#555D50', class: 'bg-[#555D50] border-neutral-600' }
+    ],
+    sizes: ['S', 'M', 'L', 'XL'],
+    description: 'Earthy green crewneck tee featuring custom enzyme wash softening treatments. Structured shoulder taped lines provide long-term shape retention.',
+    specs: [
+      'Material: 100% combed organic cotton',
+      'Fit: Regular boxy streetwear fit',
+      'Sleeve: Half sleeve',
+      'Collar: Lay-flat round collar'
+    ],
+    highlights: [
+      'Subtle washed surface handle',
+      'Reinforced taped seams',
+      'Structured 240 GSM jersey drape'
+    ],
+    fabric: 'Enzyme Washed Cotton Jersey',
+    material: '100% Organic Combed Cotton',
+    fitType: 'Regular Streetwear Fit',
+    sleeveType: 'Half Sleeve',
+    neckType: 'Round Neck',
+    pattern: 'Solid Muted Sage Green',
+    occasion: 'Casual Wear',
+    washCare: 'Machine wash cold. Turn inside out before washing.',
+    countryOfOrigin: 'India',
+    packageContents: '1 Sage Green Crew Tee',
+    brandInfo: 'CoSoStyle',
+    sizeChart: standardSizeChart,
+    seoTitle: 'Buy COSOSTYLE Sage Green Round Neck T-Shirt',
+    seoDescription: 'Shop the enzyme washed sage green t-shirt from Cosostyle. Heavyweight 240 GSM organic cotton, soft handfeel, comfort drape.',
+    seoKeywords: ['sage green t-shirt', 'washed green crewneck', 'cosostyle green tee'],
+    inventory: 110,
+    availability: 'in-stock',
+    variants: [
+      { sku: 'CS-TEE-06-SGE-S', size: 'S', color: 'Green', price: 299.00, inventory: 25, images: [EARTH_IMGS[1]] },
+      { sku: 'CS-TEE-06-SGE-M', size: 'M', color: 'Green', price: 299.00, inventory: 35, images: [EARTH_IMGS[1]] },
+      { sku: 'CS-TEE-06-SGE-L', size: 'L', color: 'Green', price: 299.00, inventory: 30, images: [EARTH_IMGS[1]] },
+      { sku: 'CS-TEE-06-SGE-XL', size: 'XL', color: 'Green', price: 299.00, inventory: 20, images: [EARTH_IMGS[1]] }
+    ]
+  }
+];
+
+const couponsData = [
+  { code: 'COSO10', discountPercent: 0.10, active: true },
+  { code: 'HEAVY20', discountPercent: 0.20, active: true },
+  { code: 'FREESHIP', discountPercent: 0.00, active: true }
+];
+
+const categoriesData = [
+  { name: 'Classic Cuts', slug: 'classic' },
+  { name: 'Graphic Tees', slug: 'graphic' },
+  { name: 'Oversized Drops', slug: 'oversized' }
+];
+
+async function seed() {
+  console.log('Seeding updated CosoStyle store database collections...');
+  await connectDB();
+
+  // Clear existing
+  await Product.deleteMany({});
+  await Category.deleteMany({});
+  await Coupon.deleteMany({});
+  await Review.deleteMany({});
+
+  // Seed Categories
+  console.log('Inserting categories...');
+  for (const cat of categoriesData) {
+    await Category.create(cat);
+  }
+
+  // Seed Coupons
+  console.log('Inserting coupons...');
+  for (const coup of couponsData) {
+    await Coupon.create(coup);
+  }
+
+  // Seed Products
+  console.log('Inserting products catalog...');
+  let currentId = 1;
+  for (const prod of productsData) {
+    const productDoc = await Product.create({
+      id: currentId++,
+      ...prod
+    });
+
+    // Seed mock reviews for each product
+    const reviewData1 = {
+      productId: productDoc.id,
+      user: 'Marcus G.',
+      rating: 5,
+      comment: 'Superb fabric weight. Drapes very clean and collar stays stiff.',
+      likes: 5,
+      helpful: true,
+      date: '2026-06-15'
+    };
+    const reviewData2 = {
+      productId: productDoc.id,
+      user: 'Sasha R.',
+      rating: 4,
+      comment: 'Extremely heavy cotton, premium texture. Fit runs a little bit loose.',
+      likes: 2,
+      helpful: false,
+      date: '2026-06-20'
+    };
+    await Review.create(reviewData1);
+    await Review.create(reviewData2);
+  }
+
+  console.log('Database seeding successfully finished!');
+  if (!isJsonDb()) {
+    process.exit(0);
+  }
+}
+
+seed().catch((err) => {
+  console.error('Seeding process crashed:', err);
+  process.exit(1);
+});

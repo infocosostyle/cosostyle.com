@@ -1,0 +1,38 @@
+[
+  {
+    "_id": "1783417285181227",
+    "id": 1783417285181,
+    "createdAt": "2026-07-07T09:41:25.181Z",
+    "title": "THE ART OF PURE ORGANIC COTTON WEAVES",
+    "slug": "pure-organic-cotton-weaves",
+    "image": "/src/assets/tshirt 1/05-05-2025 christian00425.jpg",
+    "category": "STUDIO NEWS",
+    "excerpt": "An inside look at our organic cotton sourcing, 240 GSM knitting structure, and how it shapes the geometric drape of modern streetwear.",
+    "content": "Luxury starts with the thread. At CoSoStyle, every drop uses 100% organic long-staple combed ringspun cotton. The ringspun processing stretches cotton fibers to their limit, generating tensile strength, while combed treatment removes micro impurities. The result is a 240 GSM weave that falls with structural stability.",
+    "tags": [
+      "FABRIC",
+      "STUDIO",
+      "QUALITY"
+    ],
+    "date": "2026-06-10",
+    "readTime": "4 MIN"
+  },
+  {
+    "_id": "1783417285181937",
+    "id": 1783417285181,
+    "createdAt": "2026-07-07T09:41:25.181Z",
+    "title": "THE COSOSTYLE GUIDE TO SILENT STREETWEAR",
+    "slug": "silent-streetwear-silhouettes",
+    "image": "/src/assets/tshirt 3/05-05-2025 christian00468.jpg",
+    "category": "DESIGN DIARY",
+    "excerpt": "How boxy cuts, drop shoulder lines, and structured collar design define the contemporary fashion-first look.",
+    "content": "Streetwear shapes have shifted from ad-hoc oversized to intentional geometric architecture. Our drop-shoulder cuts align precisely with shoulder bones, creating natural contour. Combined with lay-flat ribbed cuffs, this prevents collar puckering.",
+    "tags": [
+      "DESIGN",
+      "FIT",
+      "STYLING"
+    ],
+    "date": "2026-06-18",
+    "readTime": "6 MIN"
+  }
+]

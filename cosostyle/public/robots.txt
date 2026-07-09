@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+Allow: /shop
+Allow: /product/
+Allow: /blog/
+Allow: /about
+Allow: /contact
+Allow: /faq
+Allow: /policy
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /checkout
+Disallow: /order-confirmation
+Disallow: /wishlist
+Disallow: /auth
+
+# Sitemap
+Sitemap: https://cosostyle.com/sitemap.xml
+
+# Crawl delay for well-behaved bots
+Crawl-delay: 5

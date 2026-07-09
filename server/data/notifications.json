@@ -1,0 +1,20 @@
+[
+  {
+    "_id": "178341725281136",
+    "id": 1783417252811,
+    "createdAt": "2026-07-07T09:40:52.811Z",
+    "userEmail": "admin@cosostyle.com",
+    "title": "+155 Loyalty Points Earned",
+    "message": "You earned 155 points for order #1783417252810716. Total: 205 points.",
+    "link": "/dashboard"
+  },
+  {
+    "_id": "1783418600600421",
+    "id": 1783418600600,
+    "createdAt": "2026-07-07T10:03:20.600Z",
+    "userEmail": "google_demo@cosostyle.com",
+    "title": "+42 Loyalty Points Earned",
+    "message": "You earned 42 points for order #1783418600599191. Total: 42 points.",
+    "link": "/dashboard"
+  }
+]

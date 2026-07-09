@@ -1,0 +1,102 @@
+[
+  {
+    "_id": "1783417252810716",
+    "id": 1783417252810,
+    "createdAt": "2026-07-07T09:40:52.810Z",
+    "userEmail": "admin@cosostyle.com",
+    "date": "2026-07-07",
+    "status": "Placed",
+    "trackingNumber": "1ZY2KB2BZV448",
+    "items": [
+      {
+        "id": 4,
+        "title": "COSOSTYLE NAVY ROUND NECK T-SHIRT",
+        "price": 299,
+        "image": "/src/assets/tshirt 3/05-05-2025 christian00470.jpg",
+        "category": "classic",
+        "size": "S",
+        "color": "Navy",
+        "quantity": 1
+      },
+      {
+        "id": 1,
+        "title": "COSOSTYLE BLACK ROUND NECK T-SHIRT",
+        "price": 499,
+        "image": "/src/assets/tshirt 3/05-05-2025 christian00466.jpg",
+        "category": "classic",
+        "size": "M",
+        "color": "Black",
+        "quantity": 2
+      },
+      {
+        "id": 8,
+        "title": "COSOSTYLE SAGE GREEN ROUND NECK T-SHIRT",
+        "price": 299,
+        "image": "/src/assets/tshirt 5/05-05-2025 christian00497 1.jpg",
+        "category": "classic",
+        "size": "M",
+        "color": "Green",
+        "quantity": 1
+      }
+    ],
+    "subtotal": 1596,
+    "shipping": 0,
+    "tax": 114.912,
+    "discount": 159.60000000000002,
+    "total": 1551.3120000000001,
+    "shippingAddress": {
+      "name": "Admin User",
+      "street": "123 Main Street",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "zip": "400021",
+      "country": "India"
+    },
+    "notes": "",
+    "giftWrapped": false,
+    "paymentDetails": {
+      "method": "card",
+      "last4": "4242"
+    }
+  },
+  {
+    "_id": "1783418600599191",
+    "id": 1783418600599,
+    "createdAt": "2026-07-07T10:03:20.599Z",
+    "userEmail": "google_demo@cosostyle.com",
+    "date": "2026-07-07",
+    "status": "Placed",
+    "trackingNumber": "1ZIDEFCY6OCI",
+    "items": [
+      {
+        "id": 8,
+        "title": "COSOSTYLE SAGE GREEN ROUND NECK T-SHIRT",
+        "price": 299,
+        "image": "/src/assets/tshirt 5/05-05-2025 christian00497 1.jpg",
+        "category": "classic",
+        "size": "L",
+        "color": "Green",
+        "quantity": 1
+      }
+    ],
+    "subtotal": 299,
+    "shipping": 99,
+    "tax": 23.92,
+    "discount": 0,
+    "total": 421.92,
+    "shippingAddress": {
+      "name": "HIHA",
+      "street": "4719B, Flat No-102, First Floor",
+      "city": "Gurgaon",
+      "state": "Haryana",
+      "zip": "122017",
+      "country": "India"
+    },
+    "notes": "jb",
+    "giftWrapped": false,
+    "paymentDetails": {
+      "method": "cod",
+      "last4": ""
+    }
+  }
+]

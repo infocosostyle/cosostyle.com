@@ -1,0 +1,64 @@
+[
+  {
+    "_id": "1783321217047849",
+    "id": 1783321217047,
+    "createdAt": "2026-07-06T07:00:17.047Z",
+    "name": "Bhavya",
+    "email": "testuser@gmail.com",
+    "password": "$2a$10$r9BTyVJQRS5qVZG6rJMLg.sCslkENyPKCP1e8VTeTpN/8KCb4KCs.",
+    "role": "user",
+    "addresses": [],
+    "phone": ""
+  },
+  {
+    "_id": "1783396897910923",
+    "id": 1783396897910,
+    "createdAt": "2026-07-07T04:01:37.910Z",
+    "name": "Google User Demo",
+    "email": "google_demo@cosostyle.com",
+    "password": "$2a$10$ghtyzK2hqpeDV9yYJ.WR6OVOVNzZ0UQZDyxkxWVWPpqXA1Xu7953y",
+    "role": "user",
+    "addresses": [
+      {
+        "type": "Shipping",
+        "name": "HIHA",
+        "street": "4719B, Flat No-102, First Floor",
+        "city": "Gurgaon",
+        "state": "Haryana",
+        "zip": "122017",
+        "country": "India",
+        "isDefault": true,
+        "id": 1783418600590
+      }
+    ],
+    "phone": "",
+    "loyaltyPoints": 42
+  },
+  {
+    "_id": "1783416898755988",
+    "id": 1783416898755,
+    "createdAt": "2026-07-07T09:34:58.755Z",
+    "name": "Admin User",
+    "email": "admin@cosostyle.com",
+    "password": "$2a$10$c1lKrBv/hHEEtdw9RFcY.OQ3UHsyDDpxWjB9jX85hEjy3zCHIZtzO",
+    "role": "admin",
+    "addresses": [
+      {
+        "type": "Shipping",
+        "name": "Admin User",
+        "street": "123 Main Street",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "zip": "400021",
+        "country": "India",
+        "isDefault": true,
+        "id": 1783417252794
+      }
+    ],
+    "phone": "",
+    "avatar": "",
+    "loyaltyPoints": 205,
+    "referralCode": "ADMI7791",
+    "wishlist": []
+  }
+]

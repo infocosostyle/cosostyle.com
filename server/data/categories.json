@@ -1,0 +1,23 @@
+[
+  {
+    "_id": "1783416729113151",
+    "id": 1783416729113,
+    "createdAt": "2026-07-07T09:32:09.113Z",
+    "name": "Classic Cuts",
+    "slug": "classic"
+  },
+  {
+    "_id": "1783416729115287",
+    "id": 1783416729115,
+    "createdAt": "2026-07-07T09:32:09.115Z",
+    "name": "Graphic Tees",
+    "slug": "graphic"
+  },
+  {
+    "_id": "17834167291156",
+    "id": 1783416729115,
+    "createdAt": "2026-07-07T09:32:09.115Z",
+    "name": "Oversized Drops",
+    "slug": "oversized"
+  }
+]
