@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Send, Sparkles, Bot, Trash2, ChevronDown, Maximize2, Minimize2, Copy, Check, RotateCcw, Download, ShoppingBag, Heart, User, Search, RefreshCw } from 'lucide-react';
 import { api } from '../lib/api';
+import { PRODUCTS as mockProducts } from '../lib/mockApi';
 import { useAuth, useCart, useWishlist, useToasts } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -51,14 +52,20 @@ export default function AiAssistant() {
   useEffect(() => {
     async function loadCatalog() {
       try {
-        const prods = await api.getProducts();
+        let prods;
+        try {
+          prods = await api.getProducts();
+          if (!prods || prods.length === 0) prods = mockProducts;
+        } catch {
+          prods = mockProducts;
+        }
         const map = {};
         prods.forEach(p => {
           map[p.id] = p;
         });
         setCatalog(map);
       } catch (err) {
-        console.error('Failed to load products in AI assistant:', err);
+        console.warn('AI assistant using local catalog fallback');
       }
     }
     loadCatalog();

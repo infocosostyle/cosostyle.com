@@ -3,6 +3,12 @@ import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import SEO from '../components/SEO';
 
+const FALLBACK_BLOGS = [
+  { id: 1, title: 'The Philosophy of Heavyweight Cotton', excerpt: 'Why 240GSM changes everything about how a garment feels, moves, and lasts over time.', category: 'Materials', date: '2026-06-01', author: 'CosoStyle Studio', image: '/src/assets/tshirt 1/05-05-2025 christian00428.jpg' },
+  { id: 2, title: 'Box Fit vs. Oversized: A Style Guide', excerpt: 'Breaking down the nuances between structured box fits and relaxed oversized silhouettes.', category: 'Style Guide', date: '2026-06-12', author: 'CosoStyle Studio', image: '/src/assets/tshirt 2/05-05-2025 christian00445.jpg' },
+  { id: 3, title: 'Drop 01: Behind the Scenes', excerpt: 'An inside look at the creative process, fabric sourcing, and production of our debut collection.', category: 'Studio Diary', date: '2026-07-01', author: 'CosoStyle Studio', image: '/src/assets/tshirt 3/05-05-2025 christian00466.jpg' },
+];
+
 export default function Blog() {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,15 +17,17 @@ export default function Blog() {
     async function loadBlogs() {
       try {
         const list = await api.getBlogs();
-        setBlogs(list);
+        setBlogs(list && list.length > 0 ? list : FALLBACK_BLOGS);
       } catch (err) {
-        console.error('Failed to load blog articles:', err);
+        console.warn('Blog using local fallback:', err.message);
+        setBlogs(FALLBACK_BLOGS);
       } finally {
         setLoading(false);
       }
     }
     loadBlogs();
   }, []);
+
 
   return (
     <div className="w-full bg-black min-h-screen py-16 md:py-24">

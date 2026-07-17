@@ -1,4 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { auth } from '../lib/firebase';
+import { onAuthStateChanged, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+import {
+  firebaseLogin,
+  firebaseRegister,
+  firebaseGoogleLogin,
+  firebaseLogout,
+  mapFirebaseUser,
+} from '../lib/firebaseAuth';
 import { api } from '../lib/api';
 
 const AppContext = createContext(null);
@@ -38,25 +47,24 @@ export function AppProvider({ children }) {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Load active user session from server on startup
+  // Listen to Firebase auth state — runs on mount, persists across page reloads
   useEffect(() => {
-    async function loadSession() {
-      const token = localStorage.getItem('coso_token');
-      if (token) {
-        try {
-          const profile = await api.getProfile();
-          setUser(profile);
-          setAddresses(profile.addresses || []);
-          setLoyaltyPoints(profile.loyaltyPoints || 0);
-          setReferralCode(profile.referralCode || '');
-        } catch (err) {
-          localStorage.removeItem('coso_token');
-          setUser(null);
-        }
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        setUser(mapFirebaseUser(firebaseUser));
+        // Restore addresses from localStorage (scoped by user uid)
+        const savedAddresses = localStorage.getItem(`coso_addresses_${firebaseUser.uid}`);
+        setAddresses(savedAddresses ? JSON.parse(savedAddresses) : []);
+      } else {
+        setUser(null);
+        setAddresses([]);
+        setLoyaltyPoints(0);
+        setReferralCode('');
       }
       setAuthLoading(false);
-    }
-    loadSession();
+    });
+    // Cleanup listener on unmount
+    return () => unsubscribe();
   }, []);
 
   // Sync Cart to LocalStorage
@@ -93,54 +101,84 @@ export function AppProvider({ children }) {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
+  // --- FIREBASE ERROR MESSAGES ---
+  const getFriendlyAuthError = (code) => {
+    switch (code) {
+      case 'auth/user-not-found':        return 'No account found with this email.';
+      case 'auth/wrong-password':        return 'Incorrect password. Please try again.';
+      case 'auth/invalid-credential':    return 'Invalid email or password.';
+      case 'auth/email-already-in-use':  return 'An account with this email already exists.';
+      case 'auth/weak-password':         return 'Password must be at least 6 characters.';
+      case 'auth/invalid-email':         return 'Please enter a valid email address.';
+      case 'auth/too-many-requests':     return 'Too many attempts. Please try again later.';
+      case 'auth/network-request-failed':return 'Network error. Check your connection.';
+      case 'auth/popup-blocked':         return 'Popup was blocked. Please allow popups and try again.';
+      default:                           return 'Authentication failed. Please try again.';
+    }
+  };
 
-  // --- AUTH CONTROLLERS ---
-  const login = async (email, password, rememberMe) => {
+
+  // --- AUTH CONTROLLERS (Firebase) ---
+  const login = async (email, password) => {
     try {
-      const res = await api.login(email, password);
-      localStorage.setItem('coso_token', res.token);
-      setUser(res.user);
-      setAddresses(res.user.addresses || []);
-      setLoyaltyPoints(res.user.loyaltyPoints || 0);
-      setReferralCode(res.user.referralCode || '');
-      addToast(`Welcome back, ${res.user.name}!`, 'success');
-      return res.user;
+      const credential = await firebaseLogin(email, password);
+      const mappedUser = mapFirebaseUser(credential.user);
+      addToast(`Welcome back, ${mappedUser.name}!`, 'success');
+      // onAuthStateChanged will automatically update user state
+      return mappedUser;
     } catch (err) {
-      addToast(err.message || 'Login failed.', 'error');
-      throw err;
+      const msg = getFriendlyAuthError(err.code);
+      addToast(msg, 'error');
+      throw new Error(msg);
     }
   };
 
   const register = async (name, email, password) => {
     try {
-      const res = await api.register(name, email, password);
-      localStorage.setItem('coso_token', res.token);
-      setUser(res.user);
-      setAddresses([]);
-      setLoyaltyPoints(res.user.loyaltyPoints || 50);
-      setReferralCode(res.user.referralCode || '');
-      addToast('Account created! You earned 50 welcome points 🎉', 'success');
-      return res.user;
+      const credential = await firebaseRegister(email, password, name);
+      const mappedUser = mapFirebaseUser(credential.user);
+      addToast('Account created! Welcome to CosoStyle 🎉', 'success');
+      // onAuthStateChanged will automatically update user state
+      return mappedUser;
     } catch (err) {
-      addToast(err.message || 'Registration failed.', 'error');
-      throw err;
+      const msg = getFriendlyAuthError(err.code);
+      addToast(msg, 'error');
+      throw new Error(msg);
+    }
+  };
+
+  const loginWithGoogle = async () => {
+    try {
+      const credential = await firebaseGoogleLogin();
+      const mappedUser = mapFirebaseUser(credential.user);
+      addToast(`Welcome, ${mappedUser.name}!`, 'success');
+      return mappedUser;
+    } catch (err) {
+      if (err.code === 'auth/popup-closed-by-user') return null;
+      const msg = getFriendlyAuthError(err.code);
+      addToast(msg, 'error');
+      throw new Error(msg);
     }
   };
 
   const logout = async () => {
-    localStorage.removeItem('coso_token');
-    setUser(null);
-    setAddresses([]);
-    setLoyaltyPoints(0);
-    setReferralCode('');
-    addToast('Logged out successfully.', 'info');
+    try {
+      await firebaseLogout();
+      setCart([]);
+      setAddresses([]);
+      setLoyaltyPoints(0);
+      setReferralCode('');
+      addToast('Logged out successfully.', 'info');
+    } catch (err) {
+      addToast('Logout failed.', 'error');
+    }
   };
 
   const updateProfile = async (profileData) => {
     try {
-      const updatedUser = await api.updateProfile(profileData);
-      setUser(updatedUser);
-      if (updatedUser.loyaltyPoints !== undefined) setLoyaltyPoints(updatedUser.loyaltyPoints);
+      // Update local state with merged profile data
+      setUser((prev) => ({ ...prev, ...profileData }));
+      if (profileData.loyaltyPoints !== undefined) setLoyaltyPoints(profileData.loyaltyPoints);
       addToast('Profile changes saved.', 'success');
     } catch (err) {
       addToast(err.message || 'Failed to update profile.', 'error');
@@ -160,32 +198,60 @@ export function AppProvider({ children }) {
   };
 
   const changePassword = async (oldPassword, newPassword) => {
+    const currentUser = auth.currentUser;
+    if (!currentUser || !currentUser.email) {
+      addToast('No authenticated user found.', 'error');
+      return;
+    }
     try {
-      await api.changePassword(oldPassword, newPassword);
+      // Re-authenticate with old password first
+      const credential = EmailAuthProvider.credential(currentUser.email, oldPassword);
+      await reauthenticateWithCredential(currentUser, credential);
+      // Then update the password
+      await updatePassword(currentUser, newPassword);
       addToast('Password updated successfully.', 'success');
     } catch (err) {
-      addToast(err.message || 'Incorrect old password.', 'error');
-      throw err;
+      const msg = err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential'
+        ? 'Current password is incorrect.'
+        : err.code === 'auth/weak-password'
+        ? 'New password must be at least 6 characters.'
+        : 'Failed to update password. Try again.';
+      addToast(msg, 'error');
+      throw new Error(msg);
     }
   };
 
   const saveAddress = async (address) => {
     try {
-      const updatedAddresses = await api.saveAddress(address);
-      setAddresses(updatedAddresses);
+      const uid = auth.currentUser?.uid || 'guest';
+      const newAddress = address.id
+        ? address
+        : { ...address, id: Date.now().toString() };
+      setAddresses((prev) => {
+        const exists = prev.find((a) => a.id === newAddress.id);
+        const updated = exists
+          ? prev.map((a) => a.id === newAddress.id ? newAddress : a)
+          : [...prev, newAddress];
+        localStorage.setItem(`coso_addresses_${uid}`, JSON.stringify(updated));
+        return updated;
+      });
       addToast(address.id ? 'Address updated.' : 'Address added.', 'success');
     } catch (err) {
-      addToast(err.message || 'Address save error.', 'error');
+      addToast('Address save error.', 'error');
     }
   };
 
   const deleteAddress = async (id) => {
     try {
-      const updatedAddresses = await api.deleteAddress(id);
-      setAddresses(updatedAddresses);
+      const uid = auth.currentUser?.uid || 'guest';
+      setAddresses((prev) => {
+        const updated = prev.filter((a) => a.id !== id);
+        localStorage.setItem(`coso_addresses_${uid}`, JSON.stringify(updated));
+        return updated;
+      });
       addToast('Address deleted.', 'success');
     } catch (err) {
-      addToast(err.message || 'Address delete error.', 'error');
+      addToast('Address delete error.', 'error');
     }
   };
 
@@ -337,6 +403,7 @@ export function AppProvider({ children }) {
         authLoading,
         login,
         register,
+        loginWithGoogle,
         logout,
         updateProfile,
         changePassword,

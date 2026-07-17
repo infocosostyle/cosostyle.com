@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { Search, ChevronDown, SlidersHorizontal, X, Grid3X3, List, Eye } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { api } from '../lib/api';
+import { PRODUCTS as mockProducts } from '../lib/mockApi';
 import SEO from '../components/SEO';
 import { useRecentlyViewed } from '../context/AppContext';
 
@@ -40,9 +41,10 @@ export default function Shop() {
       try {
         setLoading(true);
         const list = await api.getProducts();
-        setProducts(list);
+        setProducts(list && list.length > 0 ? list : mockProducts);
       } catch (err) {
-        console.error('Failed to load catalog:', err);
+        console.warn('Backend unavailable, using local catalog:', err.message);
+        setProducts(mockProducts);
       } finally {
         setLoading(false);
       }

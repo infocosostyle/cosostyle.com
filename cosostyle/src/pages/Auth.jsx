@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth, useToasts } from '../context/AppContext';
-import { api } from '../lib/api';
+import { firebaseForgotPassword } from '../lib/firebaseAuth';
 import SEO from '../components/SEO';
 
 export default function Auth() {
-  const { user, login } = useAuth();
+  const { user, login, register, loginWithGoogle } = useAuth();
   const { addToast } = useToasts();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -13,12 +13,6 @@ export default function Auth() {
   const initialTab = searchParams.get('tab') || 'login';
   const [activeTab, setActiveTab] = useState(initialTab); // 'login' | 'register'
   
-  // Login options
-  const [loginMethod, setLoginMethod] = useState('password'); // 'password' | 'otp'
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpCode, setOtpCode] = useState('');
-  const [otpLoading, setOtpLoading] = useState(false);
-
   // Input states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -46,67 +40,32 @@ export default function Auth() {
     setLoading(true);
     try {
       if (activeTab === 'login') {
-        if (loginMethod === 'password') {
-          await login(email, password, rememberMe);
-        } else {
-          // OTP login flow
-          setOtpLoading(true);
-          const res = await api.verifyOtp(email, otpCode);
-          localStorage.setItem('coso_token', res.token);
-          // Set user session in context by reloading page or dispatching event
-          window.location.reload(); // Hard refresh to trigger AppContext loading session
-          addToast(`Welcome back, ${res.user.name}!`, 'success');
-        }
+        await login(email, password);
       } else {
-        // Register flow
-        const res = await api.register(name, email, password);
-        // Register logs them in automatically
+        await register(name, email, password);
       }
       navigate('/dashboard');
     } catch (err) {
-      addToast(err.message || 'Authentication failed.', 'error');
+      // Errors are already toasted inside login/register in AppContext
     } finally {
       setLoading(false);
-      setOtpLoading(false);
-    }
-  };
-
-  const handleSendOtp = async () => {
-    if (!email) {
-      addToast('Please enter your email first.', 'error');
-      return;
-    }
-    setOtpLoading(true);
-    try {
-      const res = await api.sendOtp(email);
-      setOtpSent(true);
-      addToast(res.message, 'success');
-    } catch (err) {
-      addToast(err.message || 'Failed to send OTP code.', 'error');
-    } finally {
-      setOtpLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      const res = await api.loginGoogle('google_demo@cosostyle.com', 'Google User Demo', 'google12345');
-      localStorage.setItem('coso_token', res.token);
-      window.location.reload();
-      addToast(`Welcome back, ${res.user.name}!`, 'success');
-      navigate('/dashboard');
+      const result = await loginWithGoogle();
+      if (result) navigate('/dashboard');
     } catch (err) {
-      addToast('Google login simulation failed.', 'error');
+      // Error already toasted in AppContext
     } finally {
       setLoading(false);
     }
   };
 
-  const [recoveryStep, setRecoveryStep] = useState('none'); // 'none' | 'request' | 'reset'
+  const [recoveryStep, setRecoveryStep] = useState('none'); // 'none' | 'request' | 'sent'
   const [recoveryEmail, setRecoveryEmail] = useState('');
-  const [recoveryCode, setRecoveryCode] = useState('');
-  const [newRecoveryPassword, setNewRecoveryPassword] = useState('');
   const [recoveryLoading, setRecoveryLoading] = useState(false);
 
   const handleForgotPassword = () => {
@@ -121,31 +80,16 @@ export default function Auth() {
     }
     setRecoveryLoading(true);
     try {
-      const res = await api.forgotPassword(recoveryEmail);
-      addToast(res.message, 'success');
-      setRecoveryStep('reset');
+      await firebaseForgotPassword(recoveryEmail);
+      addToast('Password reset email sent! Check your inbox.', 'success');
+      setRecoveryStep('sent');
     } catch (err) {
-      addToast(err.message || 'Recovery request failed.', 'error');
-    } finally {
-      setRecoveryLoading(false);
-    }
-  };
-
-  const handleResetPasswordSubmit = async (e) => {
-    e.preventDefault();
-    if (!recoveryCode || !newRecoveryPassword) {
-      addToast('Please fill in all fields.', 'error');
-      return;
-    }
-    setRecoveryLoading(true);
-    try {
-      const res = await api.resetPassword(recoveryEmail, recoveryCode, newRecoveryPassword);
-      addToast(res.message, 'success');
-      setRecoveryStep('none');
-      setEmail(recoveryEmail);
-      setLoginMethod('password');
-    } catch (err) {
-      addToast(err.message || 'Reset password failed.', 'error');
+      const msg = err.code === 'auth/user-not-found'
+        ? 'No account found with this email.'
+        : err.code === 'auth/invalid-email'
+        ? 'Please enter a valid email address.'
+        : 'Failed to send reset email. Try again.';
+      addToast(msg, 'error');
     } finally {
       setRecoveryLoading(false);
     }
@@ -161,7 +105,7 @@ export default function Auth() {
               PASSWORD RECOVERY
             </h2>
             <p className="text-neutral-500 text-[10px] tracking-widest font-black uppercase mt-1">
-              ENTER REGISTERED EMAIL
+              ENTER YOUR REGISTERED EMAIL
             </p>
           </div>
 
@@ -183,7 +127,7 @@ export default function Auth() {
               disabled={recoveryLoading}
               className="w-full bg-brand-red hover:bg-red-700 text-white font-black text-xs tracking-widest py-4 uppercase transition duration-300 rounded-full shadow-lg hover:shadow-brand-red/20 cursor-pointer disabled:opacity-40"
             >
-              {recoveryLoading ? 'SENDING CODE...' : 'SEND RECOVERY CODE'}
+              {recoveryLoading ? 'SENDING...' : 'SEND RESET LINK'}
             </button>
 
             <button
@@ -199,61 +143,39 @@ export default function Auth() {
     );
   }
 
-  if (recoveryStep === 'reset') {
+  if (recoveryStep === 'sent') {
     return (
       <div className="w-full bg-black min-h-screen py-16 flex flex-col justify-center items-center px-4 select-none animate-fade-in text-white">
-        <SEO title="Choose New Password" />
-        <div className="w-full max-w-md bg-neutral-950/20 border border-neutral-900/40 p-8 rounded-luxury shadow-luxury space-y-8">
-          <div className="text-center">
+        <SEO title="Check Your Email" />
+        <div className="w-full max-w-md bg-neutral-950/20 border border-neutral-900/40 p-8 rounded-luxury shadow-luxury space-y-8 text-center">
+          <div className="text-5xl">📧</div>
+          <div>
             <h2 className="text-white text-3xl font-black font-impact tracking-widest uppercase">
-              CREATE NEW PASSWORD
+              CHECK YOUR EMAIL
             </h2>
-            <p className="text-neutral-500 text-[10px] tracking-widest font-black uppercase mt-1">
-              ENTER RECOVERY CODE & PASSWORD
+            <p className="text-neutral-500 text-[10px] tracking-widest font-black uppercase mt-2">
+              RESET LINK SENT TO
             </p>
+            <p className="text-brand-red text-sm font-black tracking-wider mt-1">{recoveryEmail}</p>
           </div>
-
-          <form onSubmit={handleResetPasswordSubmit} className="space-y-5">
-            <div>
-              <label className="block text-[9px] font-bold text-neutral-500 tracking-widest uppercase mb-1.5">RECOVERY CODE</label>
-              <input
-                type="text"
-                required
-                value={recoveryCode}
-                onChange={(e) => setRecoveryCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                className="bg-black border border-neutral-900 focus:border-neutral-550 text-white text-xs font-semibold tracking-wider placeholder-neutral-700 outline-none w-full p-3 px-4 rounded-full transition"
-                placeholder="ENTER 6-DIGIT CODE"
-              />
-            </div>
-
-            <div>
-              <label className="block text-[9px] font-bold text-neutral-500 tracking-widest uppercase mb-1.5">NEW PASSWORD</label>
-              <input
-                type="password"
-                required
-                value={newRecoveryPassword}
-                onChange={(e) => setNewRecoveryPassword(e.target.value)}
-                className="bg-black border border-neutral-900 focus:border-neutral-550 text-white text-xs font-semibold tracking-wider placeholder-neutral-700 outline-none w-full p-3 px-4 rounded-full transition"
-                placeholder="••••••••"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={recoveryLoading}
-              className="w-full bg-brand-red hover:bg-red-700 text-white font-black text-xs tracking-widest py-4 uppercase transition duration-300 rounded-full shadow-lg hover:shadow-brand-red/20 cursor-pointer disabled:opacity-40"
-            >
-              {recoveryLoading ? 'SAVING...' : 'RESET PASSWORD'}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setRecoveryStep('request')}
-              className="w-full text-center text-[9px] font-bold tracking-widest uppercase text-neutral-500 hover:text-white transition cursor-pointer"
-            >
-              RESEND RECOVERY CODE
-            </button>
-          </form>
+          <p className="text-neutral-500 text-xs leading-relaxed">
+            Click the link in your email to reset your password. Check your spam folder if you don't see it.
+          </p>
+          <button
+            type="button"
+            onClick={() => setRecoveryStep('none')}
+            className="w-full bg-brand-red hover:bg-red-700 text-white font-black text-xs tracking-widest py-4 uppercase transition duration-300 rounded-full shadow-lg cursor-pointer"
+          >
+            BACK TO LOGIN
+          </button>
+          <button
+            type="button"
+            onClick={handleRequestRecovery}
+            disabled={recoveryLoading}
+            className="w-full text-center text-[9px] font-bold tracking-widest uppercase text-neutral-500 hover:text-white transition cursor-pointer disabled:opacity-40"
+          >
+            {recoveryLoading ? 'RESENDING...' : 'RESEND EMAIL'}
+          </button>
         </div>
       </div>
     );
@@ -296,29 +218,7 @@ export default function Auth() {
           </p>
         </div>
 
-        {/* Login Method Sub-Toggle for OTP vs Password */}
-        {activeTab === 'login' && (
-          <div className="flex border border-neutral-900 bg-black/40 rounded-full p-1 max-w-[280px] mx-auto text-[9px] font-black tracking-widest uppercase">
-            <button
-              type="button"
-              onClick={() => setLoginMethod('password')}
-              className={`w-1/2 py-2 rounded-full transition cursor-pointer ${
-                loginMethod === 'password' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:text-neutral-300'
-              }`}
-            >
-              PASSWORD
-            </button>
-            <button
-              type="button"
-              onClick={() => setLoginMethod('otp')}
-              className={`w-1/2 py-2 rounded-full transition cursor-pointer ${
-                loginMethod === 'otp' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:text-neutral-300'
-              }`}
-            >
-              OTP CODE
-            </button>
-          </div>
-        )}
+        {/* Login Method — Password only (Firebase Auth) */}
 
         {/* Input Forms */}
         <form onSubmit={handleAuthSubmit} className="space-y-5">
@@ -348,33 +248,7 @@ export default function Auth() {
             />
           </div>
 
-          {activeTab === 'login' && loginMethod === 'otp' ? (
-            <div className="space-y-4 animate-fade-in">
-              <div className="flex gap-2 items-end">
-                <div className="flex-grow">
-                  <label className="block text-[9px] font-bold text-neutral-500 tracking-widest uppercase mb-1.5">VERIFICATION CODE (OTP)</label>
-                  <input
-                    type="text"
-                    required={otpSent}
-                    disabled={!otpSent}
-                    value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    className="bg-black border border-neutral-900 focus:border-neutral-550 text-white text-xs font-semibold tracking-wider placeholder-neutral-700 outline-none w-full p-3 px-4 rounded-full transition disabled:opacity-40"
-                    placeholder="ENTER 6-DIGIT CODE"
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={handleSendOtp}
-                  disabled={otpLoading}
-                  className="bg-[#050507] border border-neutral-900 hover:border-neutral-700 text-white text-[9px] font-black tracking-widest p-4 px-6 rounded-full uppercase transition shrink-0 cursor-pointer disabled:opacity-40"
-                >
-                  {otpSent ? 'RESEND' : 'SEND CODE'}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div>
+          <div>
               <label className="block text-[9px] font-bold text-neutral-500 tracking-widest uppercase mb-1.5">PASSWORD</label>
               <input
                 type="password"
@@ -385,7 +259,6 @@ export default function Auth() {
                 placeholder="••••••••"
               />
             </div>
-          )}
 
           {activeTab === 'login' && (
             <div className="flex justify-between items-center text-[9px] font-bold tracking-widest uppercase text-neutral-500">
@@ -426,9 +299,16 @@ export default function Auth() {
           <button
             type="button"
             onClick={handleGoogleLogin}
-            className="w-full bg-[#08080A] hover:bg-[#121214] border border-neutral-900 hover:border-neutral-700 text-white font-black text-[9px] tracking-widest py-4 uppercase transition rounded-full cursor-pointer flex items-center justify-center gap-2"
+            disabled={loading}
+            className="w-full bg-[#08080A] hover:bg-[#121214] border border-neutral-900 hover:border-neutral-700 text-white font-black text-[9px] tracking-widest py-4 uppercase transition rounded-full cursor-pointer flex items-center justify-center gap-3 disabled:opacity-40"
           >
-            CONTINUE WITH GOOGLE
+            <svg className="w-4 h-4" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            {loading ? 'SIGNING IN...' : 'CONTINUE WITH GOOGLE'}
           </button>
         </form>
 

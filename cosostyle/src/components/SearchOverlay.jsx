@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Search, Clock, ArrowRight } from 'lucide-react';
 import { api } from '../lib/api';
+import { PRODUCTS as mockProducts } from '../lib/mockApi';
 
 export default function SearchOverlay({ isOpen, onClose }) {
   const [query, setQuery] = useState('');
@@ -21,9 +22,10 @@ export default function SearchOverlay({ isOpen, onClose }) {
       if (isOpen) {
         try {
           const list = await api.getProducts();
-          setProducts(list);
+          setProducts(list && list.length > 0 ? list : mockProducts);
         } catch (err) {
-          console.error('Failed to load search catalog:', err);
+          console.warn('Search using local catalog fallback');
+          setProducts(mockProducts);
         }
       }
     }

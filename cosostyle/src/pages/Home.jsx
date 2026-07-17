@@ -4,6 +4,7 @@ import { ArrowRight, ShieldCheck, Container, Truck, RefreshCw, Star, ChevronLeft
 import Manifesto from '../components/Manifesto';
 import ProductCard from '../components/ProductCard';
 import { api } from '../lib/api';
+import { PRODUCTS as mockProducts } from '../lib/mockApi';
 import SEO from '../components/SEO';
 import { useAppContext } from '../context/AppContext';
 
@@ -47,11 +48,16 @@ export default function Home() {
       try {
         setLoading(true);
         const productList = await api.getProducts();
-        setProducts(productList);
-        const bannerList = await api.getBanners();
-        setBanners(bannerList);
+        setProducts(productList && productList.length > 0 ? productList : mockProducts);
+        try {
+          const bannerList = await api.getBanners();
+          setBanners(bannerList);
+        } catch {
+          setBanners([]);
+        }
       } catch (err) {
-        console.error('Failed to load homepage telemetry:', err);
+        console.warn('Backend unavailable, using local product data:', err.message);
+        setProducts(mockProducts);
       } finally {
         setLoading(false);
       }

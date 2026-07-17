@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Heart, ChevronDown, ChevronUp, Star, ZoomIn, Info, X, Sparkles } from 'lucide-react';
 import { useCart, useWishlist, useRecentlyViewed, useToasts } from '../context/AppContext';
 import { api } from '../lib/api';
+import { PRODUCTS as mockProducts } from '../lib/mockApi';
 import SEO from '../components/SEO';
 
 export default function ProductDetails() {
@@ -51,16 +52,31 @@ export default function ProductDetails() {
     async function loadProductDetails() {
       try {
         setLoading(true);
-        const data = await api.getProduct(productId);
+        let data;
+        try {
+          data = await api.getProduct(productId);
+        } catch {
+          data = mockProducts.find((p) => p.id === productId) || mockProducts[0];
+        }
         setProduct(data);
         addToRecentlyViewed(data);
 
-        // Fetch reviews
-        const commentList = await api.getReviews(productId);
-        setReviews(commentList);
+        // Fetch reviews (graceful fallback)
+        try {
+          const commentList = await api.getReviews(productId);
+          setReviews(commentList);
+        } catch {
+          setReviews(data.reviews || []);
+        }
 
         // Fetch related and bundle products
-        const allProds = await api.getProducts();
+        let allProds;
+        try {
+          allProds = await api.getProducts();
+          if (!allProds || allProds.length === 0) allProds = mockProducts;
+        } catch {
+          allProds = mockProducts;
+        }
         const related = allProds
           .filter((p) => p.category === data.category && p.id !== data.id)
           .slice(0, 3);

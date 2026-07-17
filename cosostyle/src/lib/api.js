@@ -1,7 +1,20 @@
-const BASE_URL = 'http://localhost:5001/api';
+import { auth } from './firebase';
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
 async function apiRequest(endpoint, options = {}) {
-  const token = localStorage.getItem('coso_token');
+  // Use Firebase ID token if user is logged in, else fall back to legacy localStorage token
+  let token = null;
+  const currentUser = auth.currentUser;
+  if (currentUser) {
+    try {
+      token = await currentUser.getIdToken();
+    } catch {
+      token = localStorage.getItem('coso_token');
+    }
+  } else {
+    token = localStorage.getItem('coso_token');
+  }
 
   const headers = {
     'Content-Type': 'application/json',
@@ -21,6 +34,7 @@ async function apiRequest(endpoint, options = {}) {
 
   return response.json().catch(() => ({}));
 }
+
 
 export const api = {
   // ── Auth ──────────────────────────────────────────────────────────────────
