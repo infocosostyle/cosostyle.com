@@ -5,58 +5,58 @@ import Coupon from '../models/Coupon.js';
 import Review from '../models/Review.js';
 
 const BLANK_IMGS = [
-  "/src/assets/tshirt 1/05-05-2025 christian00428.jpg",
-  "/src/assets/tshirt 1/05-05-2025 christian00425.jpg",
-  "/src/assets/tshirt 1/05-05-2025 christian00428 - Copy.jpg",
-  "/src/assets/tshirt 1/05-05-2025 christian00430.jpg",
-  "/src/assets/tshirt 1/05-05-2025 christian00432.jpg",
-  "/src/assets/tshirt 1/05-05-2025 christian00434.jpg",
-  "/src/assets/tshirt 1/05-05-2025 christian00438.jpg",
-  "/src/assets/tshirt 1/05-05-2025 christian00440.jpg"
+  "https://api.cosostyle.com/uploads/products/tshirt 1/05-05-2025 christian00428.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 1/05-05-2025 christian00425.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 1/05-05-2025 christian00428 - Copy.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 1/05-05-2025 christian00430.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 1/05-05-2025 christian00432.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 1/05-05-2025 christian00434.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 1/05-05-2025 christian00438.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 1/05-05-2025 christian00440.jpg"
 ];
 
 const LOGO_IMGS = [
-  "/src/assets/tshirt 2/05-05-2025 christian00445.jpg",
-  "/src/assets/tshirt 2/05-05-2025 christian00444.jpg",
-  "/src/assets/tshirt 2/05-05-2025 christian00445 - Copy.jpg",
-  "/src/assets/tshirt 2/05-05-2025 christian00449.jpg",
-  "/src/assets/tshirt 2/05-05-2025 christian00450.jpg",
-  "/src/assets/tshirt 2/05-05-2025 christian00452.jpg",
-  "/src/assets/tshirt 2/05-05-2025 christian00456.jpg",
-  "/src/assets/tshirt 2/05-05-2025 christian00462.jpg"
+  "https://api.cosostyle.com/uploads/products/tshirt 2/05-05-2025 christian00445.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 2/05-05-2025 christian00444.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 2/05-05-2025 christian00445 - Copy.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 2/05-05-2025 christian00449.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 2/05-05-2025 christian00450.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 2/05-05-2025 christian00452.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 2/05-05-2025 christian00456.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 2/05-05-2025 christian00462.jpg"
 ];
 
 const SHADOW_IMGS = [
-  "/src/assets/tshirt 3/05-05-2025 christian00466.jpg",
-  "/src/assets/tshirt 3/05-05-2025 christian00463.jpg",
-  "/src/assets/tshirt 3/05-05-2025 christian00466 - Copy.jpg",
-  "/src/assets/tshirt 3/05-05-2025 christian00468.jpg",
-  "/src/assets/tshirt 3/05-05-2025 christian00470.jpg",
-  "/src/assets/tshirt 3/05-05-2025 christian00474.jpg",
-  "/src/assets/tshirt 3/05-05-2025 christian00475.jpg",
-  "/src/assets/tshirt 3/05-05-2025 christian00479.jpg"
+  "https://api.cosostyle.com/uploads/products/tshirt 3/05-05-2025 christian00466.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 3/05-05-2025 christian00463.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 3/05-05-2025 christian00466 - Copy.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 3/05-05-2025 christian00468.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 3/05-05-2025 christian00470.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 3/05-05-2025 christian00474.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 3/05-05-2025 christian00475.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 3/05-05-2025 christian00479.jpg"
 ];
 
 const VINTAGE_IMGS = [
-  "/src/assets/tshirt 4/05-05-2025 christian00483.jpg",
-  "/src/assets/tshirt 4/05-05-2025 christian00480.jpg",
-  "/src/assets/tshirt 4/05-05-2025 christian00483 - Copy.jpg",
-  "/src/assets/tshirt 4/05-05-2025 christian00485.jpg",
-  "/src/assets/tshirt 4/05-05-2025 christian00487.jpg",
-  "/src/assets/tshirt 4/05-05-2025 christian00489.jpg",
-  "/src/assets/tshirt 4/05-05-2025 christian00492.jpg",
-  "/src/assets/tshirt 4/05-05-2025 christian00496.jpg"
+  "https://api.cosostyle.com/uploads/products/tshirt 4/05-05-2025 christian00483.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 4/05-05-2025 christian00480.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 4/05-05-2025 christian00483 - Copy.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 4/05-05-2025 christian00485.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 4/05-05-2025 christian00487.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 4/05-05-2025 christian00489.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 4/05-05-2025 christian00492.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 4/05-05-2025 christian00496.jpg"
 ];
 
 const EARTH_IMGS = [
-  "/src/assets/tshirt 5/05-05-2025 christian00499.jpg",
-  "/src/assets/tshirt 5/05-05-2025 christian00497 1.jpg",
-  "/src/assets/tshirt 5/05-05-2025 christian00499 - Copy.jpg",
-  "/src/assets/tshirt 5/05-05-2025 christian00502.jpg",
-  "/src/assets/tshirt 5/05-05-2025 christian00505.jpg",
-  "/src/assets/tshirt 5/05-05-2025 christian00510.jpg",
-  "/src/assets/tshirt 5/05-05-2025 christian00511.jpg",
-  "/src/assets/tshirt 5/05-05-2025 christian00513.jpg"
+  "https://api.cosostyle.com/uploads/products/tshirt 5/05-05-2025 christian00499.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 5/05-05-2025 christian00497 1.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 5/05-05-2025 christian00499 - Copy.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 5/05-05-2025 christian00502.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 5/05-05-2025 christian00505.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 5/05-05-2025 christian00510.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 5/05-05-2025 christian00511.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 5/05-05-2025 christian00513.jpg"
 ];
 
 // Helper to generate S-2XL size chart

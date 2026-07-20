@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Send, Sparkles, Bot, Trash2, ChevronDown, Maximize2, Minimize2, Copy, Check, RotateCcw, Download, ShoppingBag, Heart, User, Search, RefreshCw } from 'lucide-react';
-import { api } from '../lib/api';
+import { api, BASE_URL } from '../lib/api';
 import { PRODUCTS as mockProducts } from '../lib/mockApi';
 import { useAuth, useCart, useWishlist, useToasts } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
@@ -133,7 +133,7 @@ export default function AiAssistant() {
       }
 
       // API call to backend chatbot route
-      const response = await fetch('http://localhost:5001/api/chatbot', {
+      const response = await fetch(`${BASE_URL}/chatbot`, {
         method: 'POST',
         headers,
         body: JSON.stringify({

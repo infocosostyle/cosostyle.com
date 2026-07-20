@@ -56,6 +56,9 @@ app.use('/api', apiLimiter);
 app.use(express.json());
 app.use(morgan('dev'));
 
+// Serve public static files for product images
+app.use('/uploads', express.static(path.resolve('uploads')));
+
 // Mount API router paths (support both /api and root paths like /products)
 app.use('/api', apiRouter);
 app.use('/', apiRouter);

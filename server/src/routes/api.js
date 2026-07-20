@@ -453,6 +453,39 @@ router.get('/loyalty', auth, async (req, res) => {
   }
 });
 
+// Helper to ensure all image URLs return complete absolute URLs pointing to backend /uploads
+const BASE_HOST = process.env.BACKEND_URL || 'https://api.cosostyle.com';
+
+const formatImageUrl = (url) => {
+  if (!url) return url;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (url.startsWith('/src/assets/')) {
+    return url.replace('/src/assets/', `${BASE_HOST}/uploads/products/`);
+  }
+  if (url.startsWith('/uploads/')) {
+    return `${BASE_HOST}${url}`;
+  }
+  if (url.startsWith('uploads/')) {
+    return `${BASE_HOST}/${url}`;
+  }
+  return `${BASE_HOST}/uploads/products/${url.replace(/^\/+/, '')}`;
+};
+
+const formatProduct = (p) => {
+  if (!p) return p;
+  const doc = typeof p.toObject === 'function' ? p.toObject() : { ...p };
+  if (doc.image) doc.image = formatImageUrl(doc.image);
+  if (Array.isArray(doc.images)) doc.images = doc.images.map(formatImageUrl);
+  if (Array.isArray(doc.variants)) {
+    doc.variants = doc.variants.map(v => ({
+      ...v,
+      image: v.image ? formatImageUrl(v.image) : v.image,
+      images: Array.isArray(v.images) ? v.images.map(formatImageUrl) : v.images
+    }));
+  }
+  return doc;
+};
+
 // =============================================================================
 // PRODUCTS ROUTES
 // =============================================================================
@@ -460,7 +493,7 @@ router.get('/loyalty', auth, async (req, res) => {
 router.get('/products', async (req, res) => {
   try {
     const list = await Product.find({});
-    res.json(list);
+    res.json(list.map(formatProduct));
   } catch (err) {
     res.status(500).json({ message: 'Server error loading catalog.' });
   }
@@ -471,7 +504,7 @@ router.get('/products/:id', async (req, res) => {
   try {
     const product = await Product.findOne({ id: prodId });
     if (!product) return res.status(404).json({ message: 'Product not found.' });
-    res.json(product);
+    res.json(formatProduct(product));
   } catch (err) {
     res.status(500).json({ message: 'Server error.' });
   }
@@ -1560,7 +1593,7 @@ Keep responses engaging, helpful, and fashionable. Ensure XML tags (\`<products_
       return res.status(500).json({ message: 'AI configuration is missing. Please contact support.' });
     }
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?key=${apiKey}`;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${process.env.GEMINI_MODEL || 'gemini-1.5-flash'}:streamGenerateContent?key=${apiKey}`;
 
     // Format conversation history for Gemini
     const contents = history ? history.map(msg => ({

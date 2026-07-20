@@ -2,58 +2,58 @@
 
 // Local assets for t-shirts from Home page
 const BLANK_IMGS = [
-  "/src/assets/tshirt 1/05-05-2025 christian00428.jpg",
-  "/src/assets/tshirt 1/05-05-2025 christian00425.jpg",
-  "/src/assets/tshirt 1/05-05-2025 christian00428 - Copy.jpg",
-  "/src/assets/tshirt 1/05-05-2025 christian00430.jpg",
-  "/src/assets/tshirt 1/05-05-2025 christian00432.jpg",
-  "/src/assets/tshirt 1/05-05-2025 christian00434.jpg",
-  "/src/assets/tshirt 1/05-05-2025 christian00438.jpg",
-  "/src/assets/tshirt 1/05-05-2025 christian00440.jpg"
+  "https://api.cosostyle.com/uploads/products/tshirt 1/05-05-2025 christian00428.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 1/05-05-2025 christian00425.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 1/05-05-2025 christian00428 - Copy.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 1/05-05-2025 christian00430.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 1/05-05-2025 christian00432.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 1/05-05-2025 christian00434.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 1/05-05-2025 christian00438.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 1/05-05-2025 christian00440.jpg"
 ];
 
 const LOGO_IMGS = [
-  "/src/assets/tshirt 2/05-05-2025 christian00445.jpg",
-  "/src/assets/tshirt 2/05-05-2025 christian00444.jpg",
-  "/src/assets/tshirt 2/05-05-2025 christian00445 - Copy.jpg",
-  "/src/assets/tshirt 2/05-05-2025 christian00449.jpg",
-  "/src/assets/tshirt 2/05-05-2025 christian00450.jpg",
-  "/src/assets/tshirt 2/05-05-2025 christian00452.jpg",
-  "/src/assets/tshirt 2/05-05-2025 christian00456.jpg",
-  "/src/assets/tshirt 2/05-05-2025 christian00462.jpg"
+  "https://api.cosostyle.com/uploads/products/tshirt 2/05-05-2025 christian00445.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 2/05-05-2025 christian00444.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 2/05-05-2025 christian00445 - Copy.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 2/05-05-2025 christian00449.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 2/05-05-2025 christian00450.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 2/05-05-2025 christian00452.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 2/05-05-2025 christian00456.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 2/05-05-2025 christian00462.jpg"
 ];
 
 const SHADOW_IMGS = [
-  "/src/assets/tshirt 3/05-05-2025 christian00466.jpg",
-  "/src/assets/tshirt 3/05-05-2025 christian00463.jpg",
-  "/src/assets/tshirt 3/05-05-2025 christian00466 - Copy.jpg",
-  "/src/assets/tshirt 3/05-05-2025 christian00468.jpg",
-  "/src/assets/tshirt 3/05-05-2025 christian00470.jpg",
-  "/src/assets/tshirt 3/05-05-2025 christian00474.jpg",
-  "/src/assets/tshirt 3/05-05-2025 christian00475.jpg",
-  "/src/assets/tshirt 3/05-05-2025 christian00479.jpg"
+  "https://api.cosostyle.com/uploads/products/tshirt 3/05-05-2025 christian00466.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 3/05-05-2025 christian00463.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 3/05-05-2025 christian00466 - Copy.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 3/05-05-2025 christian00468.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 3/05-05-2025 christian00470.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 3/05-05-2025 christian00474.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 3/05-05-2025 christian00475.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 3/05-05-2025 christian00479.jpg"
 ];
 
 const VINTAGE_IMGS = [
-  "/src/assets/tshirt 4/05-05-2025 christian00482.jpg",
-  "/src/assets/tshirt 4/05-05-2025 christian00480.jpg",
-  "/src/assets/tshirt 4/05-05-2025 christian00484.jpg",
-  "/src/assets/tshirt 4/05-05-2025 christian00486.jpg",
-  "/src/assets/tshirt 4/05-05-2025 christian00488.jpg",
-  "/src/assets/tshirt 4/05-05-2025 christian00490.jpg",
-  "/src/assets/tshirt 4/05-05-2025 christian00492.jpg",
-  "/src/assets/tshirt 4/05-05-2025 christian00494.jpg"
+  "https://api.cosostyle.com/uploads/products/tshirt 4/05-05-2025 christian00482.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 4/05-05-2025 christian00480.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 4/05-05-2025 christian00484.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 4/05-05-2025 christian00486.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 4/05-05-2025 christian00488.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 4/05-05-2025 christian00490.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 4/05-05-2025 christian00492.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 4/05-05-2025 christian00494.jpg"
 ];
 
 const EARTH_IMGS = [
-  "/src/assets/tshirt 5/05-05-2025 christian00498.jpg",
-  "/src/assets/tshirt 5/05-05-2025 christian00496.jpg",
-  "/src/assets/tshirt 5/05-05-2025 christian00500.jpg",
-  "/src/assets/tshirt 5/05-05-2025 christian00502.jpg",
-  "/src/assets/tshirt 5/05-05-2025 christian00504.jpg",
-  "/src/assets/tshirt 5/05-05-2025 christian00506.jpg",
-  "/src/assets/tshirt 5/05-05-2025 christian00508.jpg",
-  "/src/assets/tshirt 5/05-05-2025 christian00510.jpg"
+  "https://api.cosostyle.com/uploads/products/tshirt 5/05-05-2025 christian00498.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 5/05-05-2025 christian00496.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 5/05-05-2025 christian00500.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 5/05-05-2025 christian00502.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 5/05-05-2025 christian00504.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 5/05-05-2025 christian00506.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 5/05-05-2025 christian00508.jpg",
+  "https://api.cosostyle.com/uploads/products/tshirt 5/05-05-2025 christian00510.jpg"
 ];
 
 export const PRODUCTS = [
