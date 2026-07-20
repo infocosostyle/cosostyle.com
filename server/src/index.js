@@ -16,6 +16,28 @@ dotenv.config({ path: path.resolve('../cosostyle/.env') });
 const app = express();
 const PORT = process.env.PORT || 5001;
 
+const allowedOrigins = [
+  'https://cosostyle.com',
+  'https://www.cosostyle.com',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173'
+];
+
+if (process.env.CLIENT_URL && !allowedOrigins.includes(process.env.CLIENT_URL)) {
+  allowedOrigins.push(process.env.CLIENT_URL);
+}
+
+const corsOptions = {
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+// Enable CORS for client calls (must be before routes)
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
 // Helmet for security headers
 app.use(helmet({
   crossOriginResourcePolicy: false // Allow loading images from different origins if needed
@@ -31,18 +53,12 @@ const apiLimiter = rateLimit({
 });
 
 app.use('/api', apiLimiter);
-
-// Enable CORS for client calls
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
-  credentials: true
-}));
-
 app.use(express.json());
 app.use(morgan('dev'));
 
-// Mount API router paths
+// Mount API router paths (support both /api and root paths like /products)
 app.use('/api', apiRouter);
+app.use('/', apiRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
