@@ -1621,25 +1621,30 @@ Keep responses engaging, helpful, and fashionable. Ensure XML tags (\`<products_
     };
 
     // 6. Connect to Gemini & stream
-    // Setup retry mechanism (up to 2 retries on transient errors)
-    let fetchResponse;
-    let retries = 2;
-    while (retries >= 0) {
-      try {
-        fetchResponse = await fetch(geminiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody)
-        });
-        if (fetchResponse.ok) break;
-        
-        const errText = await fetchResponse.text();
-        throw new Error(`Gemini API responded with ${fetchResponse.status}: ${errText}`);
-      } catch (err) {
-        if (retries === 0) throw err;
-        console.warn(`Transient Gemini API error, retrying... (${retries} left). Error:`, err.message);
-        retries--;
-        await new Promise(r => setTimeout(r, 1000));
+    let fetchResponse = null;
+    if (apiKey) {
+      let retries = 1;
+      while (retries >= 0) {
+        try {
+          fetchResponse = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody)
+          });
+          if (fetchResponse.ok) break;
+          const errText = await fetchResponse.text();
+          console.warn(`Gemini API error ${fetchResponse.status}: ${errText}`);
+          fetchResponse = null;
+          break;
+        } catch (err) {
+          if (retries === 0) {
+            console.warn('Gemini API fetch failed:', err.message);
+            fetchResponse = null;
+            break;
+          }
+          retries--;
+          await new Promise(r => setTimeout(r, 500));
+        }
       }
     }
 
@@ -1647,6 +1652,33 @@ Keep responses engaging, helpful, and fashionable. Ensure XML tags (\`<products_
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
+
+    // Fallback response if Gemini API is missing or fails
+    if (!fetchResponse || !fetchResponse.ok) {
+      let fallbackText = "I'm here to assist with your CoSoStyle shopping! ";
+      const msgLower = message.toLowerCase();
+      const recIds = [];
+
+      if (msgLower.includes('summer') || msgLower.includes('shirt') || msgLower.includes('suggest') || msgLower.includes('recommend')) {
+        fallbackText += "For warm weather, I highly recommend our 240 GSM breathable organic cotton drops: the **Sky Blue Polo** and the **Sage Green Crew Tee**. Both offer structured boxy drapes with maximum air permeability.\n\nUse promo code **COSO15** for 15% off your order!";
+        recIds.push(2, 8);
+      } else if (msgLower.includes('size') || msgLower.includes('fit') || msgLower.includes('chart')) {
+        fallbackText += "CoSoStyle tees feature an intentional boxy, streetwear fit.\n\n• **S**: Chest 38 in (160-170cm, 55-65kg)\n• **M**: Chest 40 in (170-178cm, 65-75kg)\n• **L**: Chest 42 in (178-185cm, 75-85kg)\n• **XL**: Chest 44 in (185cm+, 85kg+)\n\nIf you prefer a closer standard fit, size down!";
+      } else if (msgLower.includes('return') || msgLower.includes('refund')) {
+        fallbackText += "We offer a hassle-free 10-day return policy! Items must be unworn with tags intact. You can initiate a return or exchange request directly from your dashboard.";
+      } else {
+        fallbackText += "Check out our best-selling heavyweight streetwear essentials below!";
+        recIds.push(1, 3);
+      }
+
+      if (recIds.length > 0) {
+        fallbackText += `<products_recommend>[${recIds.join(',')}]</products_recommend>`;
+      }
+
+      res.write(`data: ${JSON.stringify({ text: fallbackText })}\n\n`);
+      res.write('data: [DONE]\n\n');
+      return res.end();
+    }
 
     const reader = fetchResponse.body;
     let buffer = '';

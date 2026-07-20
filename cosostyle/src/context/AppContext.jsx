@@ -118,30 +118,72 @@ export function AppProvider({ children }) {
   };
 
 
-  // --- AUTH CONTROLLERS (Firebase) ---
+  // --- AUTH CONTROLLERS (Backend API + Firebase) ---
   const login = async (email, password) => {
+    let backendUser = null;
+    let backendErr = null;
+
+    try {
+      const res = await api.login(email, password);
+      if (res && res.token) {
+        localStorage.setItem('coso_token', res.token);
+        backendUser = res.user;
+      }
+    } catch (err) {
+      backendErr = err;
+    }
+
     try {
       const credential = await firebaseLogin(email, password);
       const mappedUser = mapFirebaseUser(credential.user);
+      if (backendUser) {
+        Object.assign(mappedUser, backendUser);
+      }
+      setUser(mappedUser);
       addToast(`Welcome back, ${mappedUser.name}!`, 'success');
-      // onAuthStateChanged will automatically update user state
       return mappedUser;
-    } catch (err) {
-      const msg = getFriendlyAuthError(err.code);
+    } catch (fbErr) {
+      if (backendUser) {
+        setUser(backendUser);
+        addToast(`Welcome back, ${backendUser.name}!`, 'success');
+        return backendUser;
+      }
+      const msg = getFriendlyAuthError(fbErr.code) || backendErr?.message || 'Invalid email or password.';
       addToast(msg, 'error');
       throw new Error(msg);
     }
   };
 
   const register = async (name, email, password) => {
+    let backendUser = null;
+    let backendErr = null;
+
+    try {
+      const res = await api.register(name, email, password);
+      if (res && res.token) {
+        localStorage.setItem('coso_token', res.token);
+        backendUser = res.user;
+      }
+    } catch (err) {
+      backendErr = err;
+    }
+
     try {
       const credential = await firebaseRegister(email, password, name);
       const mappedUser = mapFirebaseUser(credential.user);
-      addToast('Account created! Welcome to CosoStyle 🎉', 'success');
-      // onAuthStateChanged will automatically update user state
+      if (backendUser) {
+        Object.assign(mappedUser, backendUser);
+      }
+      setUser(mappedUser);
+      addToast('Account created! Welcome to CoSoStyle 🎉', 'success');
       return mappedUser;
-    } catch (err) {
-      const msg = getFriendlyAuthError(err.code);
+    } catch (fbErr) {
+      if (backendUser) {
+        setUser(backendUser);
+        addToast('Account created! Welcome to CoSoStyle 🎉', 'success');
+        return backendUser;
+      }
+      const msg = getFriendlyAuthError(fbErr.code) || backendErr?.message || 'Registration failed.';
       addToast(msg, 'error');
       throw new Error(msg);
     }
@@ -151,6 +193,16 @@ export function AppProvider({ children }) {
     try {
       const credential = await firebaseGoogleLogin();
       const mappedUser = mapFirebaseUser(credential.user);
+      try {
+        const res = await api.loginGoogle(mappedUser.email, mappedUser.name, mappedUser.uid);
+        if (res && res.token) {
+          localStorage.setItem('coso_token', res.token);
+          if (res.user) Object.assign(mappedUser, res.user);
+        }
+      } catch (e) {
+        console.warn('Backend google login sync warning:', e);
+      }
+      setUser(mappedUser);
       addToast(`Welcome, ${mappedUser.name}!`, 'success');
       return mappedUser;
     } catch (err) {
@@ -163,14 +215,18 @@ export function AppProvider({ children }) {
 
   const logout = async () => {
     try {
+      localStorage.removeItem('coso_token');
       await firebaseLogout();
+      setUser(null);
       setCart([]);
       setAddresses([]);
       setLoyaltyPoints(0);
       setReferralCode('');
       addToast('Logged out successfully.', 'info');
     } catch (err) {
-      addToast('Logout failed.', 'error');
+      localStorage.removeItem('coso_token');
+      setUser(null);
+      addToast('Logged out.', 'info');
     }
   };
 

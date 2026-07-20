@@ -3,17 +3,13 @@ import { auth } from './firebase';
 export const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.cosostyle.com';
 
 async function apiRequest(endpoint, options = {}) {
-  // Use Firebase ID token if user is logged in, else fall back to legacy localStorage token
-  let token = null;
-  const currentUser = auth.currentUser;
-  if (currentUser) {
+  let token = localStorage.getItem('coso_token');
+  if (!token && auth?.currentUser) {
     try {
-      token = await currentUser.getIdToken();
+      token = await auth.currentUser.getIdToken();
     } catch {
-      token = localStorage.getItem('coso_token');
+      token = null;
     }
-  } else {
-    token = localStorage.getItem('coso_token');
   }
 
   const headers = {
@@ -25,14 +21,21 @@ async function apiRequest(endpoint, options = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, { ...options, headers });
+  try {
+    const response = await fetch(`${BASE_URL}${endpoint}`, { ...options, headers });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `Request failed with status ${response.status}`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Request failed with status ${response.status}`);
+    }
+
+    return await response.json().catch(() => ({}));
+  } catch (err) {
+    if (err.name === 'TypeError' && err.message?.toLowerCase().includes('fetch')) {
+      throw new Error('Unable to connect to CosoStyle server. Please check your network connection.');
+    }
+    throw err;
   }
-
-  return response.json().catch(() => ({}));
 }
 
 
