@@ -1,6 +1,6 @@
 import { auth } from './firebase';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://cosostyle-com.onrender.com';
 
 async function apiRequest(endpoint, options = {}) {
   // Use Firebase ID token if user is logged in, else fall back to legacy localStorage token
